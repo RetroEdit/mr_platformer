@@ -28,12 +28,16 @@ def end_game_process():
 
 def read_save(save_path, message="read save"):
     save_items = []
-    with open(save_path, 'rb') as infile:
-        for i in range(GAME_SAVE_FIELD_COUNT):
-            field_triplet = struct.unpack('<3i', infile.read(3*4))
-            assert field_triplet[:2] == SAVE_FIELD_PREFIX
-            save_items.append(field_triplet[2])
-    print(f"[{message}]\ncontents: {GameSave(*save_items)}")
+    try:
+        with open(save_path, 'rb') as infile:
+            for i in range(GAME_SAVE_FIELD_COUNT):
+                field_triplet = struct.unpack('<3i', infile.read(3*4))
+                assert field_triplet[:2] == SAVE_FIELD_PREFIX
+                save_items.append(field_triplet[2])
+        save = GameSave(*save_items)
+    except FileNotFoundError:
+        save = None
+    print(f"[{message}]\ncontents: {save}")
 
 def overwrite_save(save_path, save):
     read_save(save_path, "previous save contents")
